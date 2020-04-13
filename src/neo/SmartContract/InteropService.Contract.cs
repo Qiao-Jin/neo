@@ -28,12 +28,6 @@ namespace Neo.SmartContract
             /// </summary>
             public static readonly InteropDescriptor CreateStandardAccount = Register("System.Contract.CreateStandardAccount", Contract_CreateStandardAccount, 0_00010000, TriggerType.All, CallFlags.None);
 
-            /// <summary>
-            /// Calculate corresponding account scripthash for given public key
-            /// Warning: check first that input public key is valid, before creating the script.
-            /// </summary>
-            public static readonly InteropDescriptor CreateStandardAccount = Register("System.Contract.CreateStandardAccount", Contract_CreateStandardAccount, 0_00010000, TriggerType.All, CallFlags.None);
-
             private static long GetDeploymentPrice(EvaluationStack stack, StoreView snapshot)
             {
                 int size = stack.Peek(0).GetByteLength() + stack.Peek(1).GetByteLength();
