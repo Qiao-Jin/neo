@@ -171,9 +171,9 @@ namespace Neo.UnitTests.Wallets
         public void TestGetAccount1()
         {
             MyWallet wallet = new MyWallet();
-            wallet.CreateAccount(UInt160.Parse("0x7e471cf52f27edc291e29ec8f2d1ea2d210d6725"));
+            wallet.CreateAccount(UInt160.Parse("0xf55f6873ae944cf4ec9626e8855b8554e798a7d1"));
             WalletAccount account = wallet.GetAccount(ECCurve.Secp256r1.G);
-            account.ScriptHash.Should().Be(UInt160.Parse("0x7e471cf52f27edc291e29ec8f2d1ea2d210d6725"));
+            account.ScriptHash.Should().Be(UInt160.Parse("0xf55f6873ae944cf4ec9626e8855b8554e798a7d1"));
         }
 
         [TestMethod]
@@ -203,24 +203,14 @@ namespace Neo.UnitTests.Wallets
             // Fake balance
             var snapshot = Blockchain.Singleton.GetSnapshot();
             var key = NativeContract.GAS.CreateStorageKey(20, account.ScriptHash);
-            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem
-            {
-                Value = new Nep5AccountState().ToByteArray()
-            });
-            entry.Value = new Nep5AccountState()
-            {
-                Balance = 10000 * NativeContract.GAS.Factor
-            }
-            .ToByteArray();
+            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 10000 * NativeContract.GAS.Factor;
             snapshot.Commit();
 
             wallet.GetAvailable(NativeContract.GAS.Hash).Should().Be(new BigDecimal(1000000000000, 8));
 
-            entry.Value = new Nep5AccountState()
-            {
-                Balance = 0
-            }
-            .ToByteArray();
+            entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 0;
             snapshot.Commit();
         }
 
@@ -235,25 +225,15 @@ namespace Neo.UnitTests.Wallets
             // Fake balance
             var snapshot = Blockchain.Singleton.GetSnapshot();
             var key = NativeContract.GAS.CreateStorageKey(20, account.ScriptHash);
-            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem
-            {
-                Value = new Nep5AccountState().ToByteArray()
-            });
-            entry.Value = new Nep5AccountState()
-            {
-                Balance = 10000 * NativeContract.GAS.Factor
-            }
-            .ToByteArray();
+            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 10000 * NativeContract.GAS.Factor;
             snapshot.Commit();
 
             wallet.GetBalance(UInt160.Zero, new UInt160[] { account.ScriptHash }).Should().Be(new BigDecimal(0, 0));
             wallet.GetBalance(NativeContract.GAS.Hash, new UInt160[] { account.ScriptHash }).Should().Be(new BigDecimal(1000000000000, 8));
 
-            entry.Value = new Nep5AccountState()
-            {
-                Balance = 0
-            }
-            .ToByteArray();
+            entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 0;
             snapshot.Commit();
         }
 
@@ -345,26 +325,12 @@ namespace Neo.UnitTests.Wallets
             // Fake balance
             var snapshot = Blockchain.Singleton.GetSnapshot();
             var key = NativeContract.GAS.CreateStorageKey(20, account.ScriptHash);
-            var entry1 = snapshot.Storages.GetAndChange(key, () => new StorageItem
-            {
-                Value = new Nep5AccountState().ToByteArray()
-            });
-            entry1.Value = new Nep5AccountState()
-            {
-                Balance = 10000 * NativeContract.GAS.Factor
-            }
-            .ToByteArray();
+            var entry1 = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry1.GetInteroperable<AccountState>().Balance = 10000 * NativeContract.GAS.Factor;
 
             key = NativeContract.NEO.CreateStorageKey(20, account.ScriptHash);
-            var entry2 = snapshot.Storages.GetAndChange(key, () => new StorageItem
-            {
-                Value = new Nep5AccountState().ToByteArray()
-            });
-            entry2.Value = new NeoToken.AccountState()
-            {
-                Balance = 10000 * NativeContract.NEO.Factor
-            }
-            .ToByteArray();
+            var entry2 = snapshot.Storages.GetAndChange(key, () => new StorageItem(new NeoToken.NeoAccountState()));
+            entry2.GetInteroperable<NeoToken.NeoAccountState>().Balance = 10000 * NativeContract.NEO.Factor;
 
             snapshot.Commit();
 
@@ -390,16 +356,10 @@ namespace Neo.UnitTests.Wallets
             });
             tx.Should().NotBeNull();
 
-            entry1.Value = new Nep5AccountState()
-            {
-                Balance = 0
-            }
-            .ToByteArray();
-            entry2.Value = new NeoToken.AccountState()
-            {
-                Balance = 0
-            }
-            .ToByteArray();
+            entry1 = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry2 = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry1.GetInteroperable<AccountState>().Balance = 0;
+            entry2.GetInteroperable<NeoToken.NeoAccountState>().Balance = 0;
             snapshot.Commit();
         }
 
@@ -417,15 +377,8 @@ namespace Neo.UnitTests.Wallets
             // Fake balance
             var snapshot = Blockchain.Singleton.GetSnapshot();
             var key = NativeContract.GAS.CreateStorageKey(20, account.ScriptHash);
-            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem
-            {
-                Value = new Nep5AccountState().ToByteArray()
-            });
-            entry.Value = new Nep5AccountState()
-            {
-                Balance = 1000000 * NativeContract.GAS.Factor
-            }
-            .ToByteArray();
+            var entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 1000000 * NativeContract.GAS.Factor;
             snapshot.Commit();
 
             var tx = wallet.MakeTransaction(new byte[] { }, account.ScriptHash, new TransactionAttribute[] { });
@@ -434,11 +387,8 @@ namespace Neo.UnitTests.Wallets
             tx = wallet.MakeTransaction(new byte[] { }, null, new TransactionAttribute[] { });
             tx.Should().NotBeNull();
 
-            entry.Value = new NeoToken.AccountState()
-            {
-                Balance = 0
-            }
-            .ToByteArray();
+            entry = snapshot.Storages.GetAndChange(key, () => new StorageItem(new AccountState()));
+            entry.GetInteroperable<AccountState>().Balance = 0;
             snapshot.Commit();
         }
 

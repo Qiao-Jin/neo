@@ -247,23 +247,6 @@ namespace Neo.UnitTests.IO.Caching
         }
 
         [TestMethod]
-        public void TestDeleteWhere()
-        {
-            myDataCache.Add(new MyKey("key1"), new MyValue("value1"));
-            myDataCache.Add(new MyKey("key2"), new MyValue("value2"));
-
-            myDataCache.InnerDict.Add(new MyKey("key3"), new MyValue("value3"));
-            myDataCache.InnerDict.Add(new MyKey("key4"), new MyValue("value4"));
-
-            myDataCache.DeleteWhere((k, v) => k.Key.StartsWith("key"));
-            myDataCache.Commit();
-            myDataCache.TryGet(new MyKey("key1")).Should().BeNull();
-            myDataCache.TryGet(new MyKey("key2")).Should().BeNull();
-            myDataCache.InnerDict.ContainsKey(new MyKey("key1")).Should().BeFalse();
-            myDataCache.InnerDict.ContainsKey(new MyKey("key2")).Should().BeFalse();
-        }
-
-        [TestMethod]
         public void TestFind()
         {
             myDataCache.Add(new MyKey("key1"), new MyValue("value1"));
@@ -342,6 +325,31 @@ namespace Neo.UnitTests.IO.Caching
             myDataCache.TryGet(new MyKey("key1")).Should().Be(new MyValue("value1"));
             myDataCache.TryGet(new MyKey("key2")).Should().Be(new MyValue("value2"));
             myDataCache.TryGet(new MyKey("key3")).Should().BeNull();
+        }
+
+        [TestMethod]
+        public void TestFindInvalid()
+        {
+            var myDataCache = new MyDataCache<MyKey, MyValue>();
+            myDataCache.Add(new MyKey("key1"), new MyValue("value1"));
+
+            myDataCache.InnerDict.Add(new MyKey("key2"), new MyValue("value2"));
+            myDataCache.InnerDict.Add(new MyKey("key3"), new MyValue("value3"));
+            myDataCache.InnerDict.Add(new MyKey("key4"), new MyValue("value3"));
+
+            var items = myDataCache.Find().GetEnumerator();
+            items.MoveNext().Should().Be(true);
+            items.Current.Key.Should().Be(new MyKey("key1"));
+
+            myDataCache.TryGet(new MyKey("key3")); // GETLINE
+
+            items.MoveNext().Should().Be(true);
+            items.Current.Key.Should().Be(new MyKey("key2"));
+            items.MoveNext().Should().Be(true);
+            items.Current.Key.Should().Be(new MyKey("key3"));
+            items.MoveNext().Should().Be(true);
+            items.Current.Key.Should().Be(new MyKey("key4"));
+            items.MoveNext().Should().Be(false);
         }
     }
 }
