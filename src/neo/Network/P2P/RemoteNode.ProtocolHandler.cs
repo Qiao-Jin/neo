@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Neo.Network.P2P
 {
@@ -24,6 +23,26 @@ namespace Neo.Network.P2P
             protected override UInt256 GetKeyForItem((UInt256, DateTime) item)
             {
                 return item.Item1;
+            }
+        }
+
+        private class Verificator
+        {
+            private readonly NeoSystem _system;
+
+            public Verificator(NeoSystem system)
+            {
+                _system = system;
+            }
+
+            public void VerifyTx(Transaction tx)
+            {
+                if (tx.VerifyStateIndependent() == VerifyResult.Succeed)
+                {
+                    _system.TaskManager.Tell(tx);
+                    _system.Consensus?.Tell(tx);
+                    _system.Blockchain.Tell(tx, ActorRefs.NoSender);
+                }
             }
         }
 
@@ -111,14 +130,10 @@ namespace Neo.Network.P2P
                 case MessageCommand.Transaction:
                     Transaction tx = (Transaction)msg.Payload;
                     RenewKnownHashes(tx.Hash);
-                    Task.Run(() =>
+                    if (msg.Payload.Size <= Transaction.MaxTransactionSize)
                     {
-                        if (msg.Payload.Size <= Transaction.MaxTransactionSize)
-                        {
-                            if (tx.VerifyStateIndependent() == VerifyResult.Succeed)
-                                OnInventoryReceived(tx);
-                        }
-                    });
+                        VerificationQueue.Enqueue(tx);
+                    }
                     break;
                 case MessageCommand.Verack:
                 case MessageCommand.Version:
