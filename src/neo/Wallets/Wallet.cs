@@ -428,7 +428,7 @@ namespace Neo.Wallets
                         if (engine.State != VMState.HALT)
                             throw new InvalidOperationException($"Execution for {assetId}.balanceOf('{account}' fault");
                         BigInteger value = engine.ResultStack.Pop().GetInteger();
-                        if (value.Sign > 0) balances.Add((account, value));
+                        balances.Add((account, value));
                     }
                     BigInteger sum_balance = balances.Select(p => p.Value).Sum();
                     if (sum_balance < sum)
