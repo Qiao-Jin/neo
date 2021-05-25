@@ -158,7 +158,7 @@ namespace Neo.Wallets
             if (sum_balance == amount)
             {
                 result.AddRange(orderedAccounts);
-                orderedAccounts.Clear();
+                if (amount > 0) orderedAccounts.Clear();
             }
             else
             {
