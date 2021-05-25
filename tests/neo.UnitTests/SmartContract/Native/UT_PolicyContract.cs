@@ -32,7 +32,7 @@ namespace Neo.UnitTests.SmartContract.Native
 
             var ret = NativeContract.Policy.Call(snapshot, "getFeePerByte");
             ret.Should().BeOfType<VM.Types.Integer>();
-            ret.GetInteger().Should().Be(1000);
+            ret.GetInteger().Should().Be(0);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace Neo.UnitTests.SmartContract.Native
 
             var ret = NativeContract.Policy.Call(snapshot, "getFeePerByte");
             ret.Should().BeOfType<VM.Types.Integer>();
-            ret.GetInteger().Should().Be(1000);
+            ret.GetInteger().Should().Be(0);
 
             // With signature
             UInt160 committeeMultiSigAddr = NativeContract.NEO.GetCommitteeAddress(snapshot);
@@ -71,7 +71,7 @@ namespace Neo.UnitTests.SmartContract.Native
 
             ret = NativeContract.Policy.Call(snapshot, "getFeePerByte");
             ret.Should().BeOfType<VM.Types.Integer>();
-            ret.GetInteger().Should().Be(1);
+            ret.GetInteger().Should().Be(0);
         }
 
         [TestMethod]

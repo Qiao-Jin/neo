@@ -12,7 +12,7 @@ namespace Neo.UnitTests.SmartContract.Native
         public void TestTotalSupply()
         {
             var snapshot = TestBlockchain.GetTestSnapshot();
-            NativeContract.GAS.TotalSupply(snapshot).Should().Be(3000000050000000);
+            NativeContract.GAS.TotalSupply(snapshot).Should().Be(3000000000000000);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Neo.SmartContract.Native
         [ContractMethod(CpuFee = 1 << 15, RequiredCallFlags = CallFlags.ReadStates)]
         public long GetFeePerByte(DataCache snapshot)
         {
-            return (long)(BigInteger)snapshot[CreateStorageKey(Prefix_FeePerByte)];
+            return 0;
         }
 
         /// <summary>

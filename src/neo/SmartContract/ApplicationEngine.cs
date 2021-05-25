@@ -438,7 +438,7 @@ namespace Neo.SmartContract
         protected virtual void OnSysCall(InteropDescriptor descriptor)
         {
             ValidateCallFlags(descriptor.RequiredCallFlags);
-            AddGas(descriptor.FixedPrice * exec_fee_factor);
+            //AddGas(descriptor.FixedPrice * exec_fee_factor);
 
             object[] parameters = new object[descriptor.Parameters.Count];
             for (int i = 0; i < parameters.Length; i++)
@@ -449,11 +449,11 @@ namespace Neo.SmartContract
                 Push(Convert(returnValue));
         }
 
-        protected override void PreExecuteInstruction()
+        /*protected override void PreExecuteInstruction()
         {
             if (CurrentContext.InstructionPointer < CurrentContext.Script.Length)
                 AddGas(exec_fee_factor * OpCodePrices[CurrentContext.CurrentInstruction.OpCode]);
-        }
+        }*/
 
         private static Block CreateDummyBlock(DataCache snapshot, ProtocolSettings settings)
         {

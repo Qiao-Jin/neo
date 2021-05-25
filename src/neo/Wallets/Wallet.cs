@@ -462,7 +462,7 @@ namespace Neo.Wallets
                 script = sb.ToArray();
             }
             if (balances_gas is null)
-                balances_gas = accounts.Select(p => (Account: p, Value: NativeContract.GAS.BalanceOf(snapshot, p))).Where(p => p.Value.Sign > 0).ToList();
+                balances_gas = accounts.Select(p => (Account: p, Value: NativeContract.GAS.BalanceOf(snapshot, p))).ToList();
 
             return MakeTransaction(snapshot, script, cosignerList.Values.ToArray(), Array.Empty<TransactionAttribute>(), balances_gas);
         }
@@ -488,7 +488,7 @@ namespace Neo.Wallets
             {
                 accounts = new[] { sender };
             }
-            var balances_gas = accounts.Select(p => (Account: p, Value: NativeContract.GAS.BalanceOf(snapshot, p))).Where(p => p.Value.Sign > 0).ToList();
+            var balances_gas = accounts.Select(p => (Account: p, Value: NativeContract.GAS.BalanceOf(snapshot, p))).ToList();
             return MakeTransaction(snapshot, script, cosigners ?? Array.Empty<Signer>(), attributes ?? Array.Empty<TransactionAttribute>(), balances_gas, maxGas);
         }
 
@@ -534,9 +534,9 @@ namespace Neo.Wallets
             UInt160[] hashes = tx.GetScriptHashesForVerifying(snapshot);
 
             // base size for transaction: includes const_header + signers + attributes + script + hashes
-            int size = Transaction.HeaderSize + tx.Signers.GetVarSize() + tx.Attributes.GetVarSize() + tx.Script.GetVarSize() + IO.Helper.GetVarSize(hashes.Length);
-            uint exec_fee_factor = NativeContract.Policy.GetExecFeeFactor(snapshot);
-            long networkFee = 0;
+            //int size = Transaction.HeaderSize + tx.Signers.GetVarSize() + tx.Attributes.GetVarSize() + tx.Script.GetVarSize() + IO.Helper.GetVarSize(hashes.Length);
+            //uint exec_fee_factor = NativeContract.Policy.GetExecFeeFactor(snapshot);
+            //long networkFee = 0;
             int index = -1;
             foreach (UInt160 hash in hashes)
             {
@@ -572,8 +572,8 @@ namespace Neo.Wallets
                         throw new ArgumentException("The verify method doesn't return boolean value.");
 
                     // Empty verification and non-empty invocation scripts
-                    var invSize = invocationScript != null ? invocationScript.GetVarSize() : Array.Empty<byte>().GetVarSize();
-                    size += Array.Empty<byte>().GetVarSize() + invSize;
+                    //var invSize = invocationScript != null ? invocationScript.GetVarSize() : Array.Empty<byte>().GetVarSize();
+                    //size += Array.Empty<byte>().GetVarSize() + invSize;
 
                     // Check verify cost
                     using ApplicationEngine engine = ApplicationEngine.Create(TriggerType.Verification, tx, snapshot.CreateSnapshot(), settings: ProtocolSettings);
@@ -582,26 +582,26 @@ namespace Neo.Wallets
                     if (engine.Execute() == VMState.FAULT) throw new ArgumentException($"Smart contract {contract.Hash} verification fault.");
                     if (!engine.ResultStack.Pop().GetBoolean()) throw new ArgumentException($"Smart contract {contract.Hash} returns false.");
 
-                    networkFee += engine.GasConsumed;
+                    //networkFee += engine.GasConsumed;
                 }
                 else if (witness_script.IsSignatureContract())
                 {
-                    size += 67 + witness_script.GetVarSize();
-                    networkFee += exec_fee_factor * SignatureContractCost();
+                    //size += 67 + witness_script.GetVarSize();
+                    //networkFee += exec_fee_factor * SignatureContractCost();
                 }
                 else if (witness_script.IsMultiSigContract(out int m, out int n))
                 {
-                    int size_inv = 66 * m;
-                    size += IO.Helper.GetVarSize(size_inv) + size_inv + witness_script.GetVarSize();
-                    networkFee += exec_fee_factor * MultiSignatureContractCost(m, n);
+                    //int size_inv = 66 * m;
+                    //size += IO.Helper.GetVarSize(size_inv) + size_inv + witness_script.GetVarSize();
+                    //networkFee += exec_fee_factor * MultiSignatureContractCost(m, n);
                 }
                 else
                 {
                     //We can support more contract types in the future.
                 }
             }
-            networkFee += size * NativeContract.Policy.GetFeePerByte(snapshot);
-            return networkFee;
+            //networkFee += size * NativeContract.Policy.GetFeePerByte(snapshot);
+            return 0;
         }
 
         /// <summary>

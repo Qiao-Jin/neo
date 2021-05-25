@@ -174,9 +174,9 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             }
 
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
-            Assert.AreEqual(1967100, verificationGas);
-            Assert.AreEqual(348000, sizeGas);
-            Assert.AreEqual(2315100, tx.NetworkFee);
+            Assert.AreEqual(0, verificationGas);
+            Assert.AreEqual(0, sizeGas);
+            Assert.AreEqual(0, tx.NetworkFee);
         }
 
         [TestMethod]
@@ -215,7 +215,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             Assert.IsNull(tx.Witnesses);
 
             // check pre-computed network fee (already guessing signature sizes)
-            tx.NetworkFee.Should().Be(1228520L);
+            tx.NetworkFee.Should().Be(0);
 
             // ----
             // Sign
@@ -273,12 +273,12 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // I + II + III + IV
             Assert.AreEqual(25 + 22 + 1 + 88 + 109, tx.Size);
 
-            Assert.AreEqual(1000, NativeContract.Policy.GetFeePerByte(snapshot));
+            Assert.AreEqual(0, NativeContract.Policy.GetFeePerByte(snapshot));
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
 
             // final check: verification_cost and tx_size
-            Assert.AreEqual(245000, sizeGas);
-            Assert.AreEqual(983520, verificationGas);
+            Assert.AreEqual(0, sizeGas);
+            Assert.AreEqual(0, verificationGas);
 
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
@@ -361,7 +361,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // get sizeGas
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
             // final check on sum: verification_cost + tx_size
-            Assert.AreEqual(1228520, verificationGas + sizeGas);
+            Assert.AreEqual(0, verificationGas + sizeGas);
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
         }
@@ -444,7 +444,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // get sizeGas
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
             // final check on sum: verification_cost + tx_size
-            Assert.AreEqual(1249520, verificationGas + sizeGas);
+            Assert.AreEqual(0, verificationGas + sizeGas);
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
         }
@@ -530,7 +530,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // get sizeGas
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
             // final check on sum: verification_cost + tx_size
-            Assert.AreEqual(1249520, verificationGas + sizeGas);
+            Assert.AreEqual(0, verificationGas + sizeGas);
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
         }
@@ -666,7 +666,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // get sizeGas
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
             // final check on sum: verification_cost + tx_size
-            Assert.AreEqual(1269520, verificationGas + sizeGas);
+            Assert.AreEqual(0, verificationGas + sizeGas);
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
         }
@@ -1061,7 +1061,7 @@ namespace Neo.UnitTests.Network.P2P.Payloads
             // get sizeGas
             var sizeGas = tx.Size * NativeContract.Policy.GetFeePerByte(snapshot);
             // final check on sum: verification_cost + tx_size
-            Assert.AreEqual(1228520, verificationGas + sizeGas);
+            Assert.AreEqual(0, verificationGas + sizeGas);
             // final assert
             Assert.AreEqual(tx.NetworkFee, verificationGas + sizeGas);
         }

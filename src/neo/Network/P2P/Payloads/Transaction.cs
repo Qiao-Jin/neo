@@ -65,7 +65,7 @@ namespace Neo.Network.P2P.Payloads
         /// <summary>
         /// The <see cref="NetworkFee"/> for the transaction divided by its <see cref="Size"/>.
         /// </summary>
-        public long FeePerByte => NetworkFee / Size;
+        public long FeePerByte = 0;
 
         private UInt256 _hash = null;
         public UInt256 Hash
@@ -354,24 +354,19 @@ namespace Neo.Network.P2P.Payloads
             foreach (TransactionAttribute attribute in Attributes)
                 if (!attribute.Verify(snapshot, this))
                     return VerifyResult.Invalid;
-            long net_fee = NetworkFee - Size * NativeContract.Policy.GetFeePerByte(snapshot);
-            if (net_fee < 0) return VerifyResult.InsufficientFunds;
+            //long net_fee = NetworkFee - Size * NativeContract.Policy.GetFeePerByte(snapshot);
+            //if (net_fee < 0) return VerifyResult.InsufficientFunds;
 
-            if (net_fee > MaxVerificationGas) net_fee = MaxVerificationGas;
+            //if (net_fee > MaxVerificationGas) net_fee = MaxVerificationGas;
             uint execFeeFactor = NativeContract.Policy.GetExecFeeFactor(snapshot);
             for (int i = 0; i < hashes.Length; i++)
             {
-                if (witnesses[i].VerificationScript.IsSignatureContract())
-                    net_fee -= execFeeFactor * SignatureContractCost();
-                else if (witnesses[i].VerificationScript.IsMultiSigContract(out int m, out int n))
-                    net_fee -= execFeeFactor * MultiSignatureContractCost(m, n);
-                else
+                if (!witnesses[i].VerificationScript.IsSignatureContract() || !witnesses[i].VerificationScript.IsMultiSigContract(out int m, out int n))
                 {
-                    if (!this.VerifyWitness(settings, snapshot, hashes[i], witnesses[i], net_fee, out long fee))
+                    if (!this.VerifyWitness(settings, snapshot, hashes[i], witnesses[i], 0, out long fee))
                         return VerifyResult.Invalid;
-                    net_fee -= fee;
                 }
-                if (net_fee < 0) return VerifyResult.InsufficientFunds;
+                //if (net_fee < 0) return VerifyResult.InsufficientFunds;
             }
             return VerifyResult.Succeed;
         }
@@ -401,7 +396,7 @@ namespace Neo.Network.P2P.Payloads
                     else
                     {
                         net_fee -= fee;
-                        if (net_fee < 0) return VerifyResult.InsufficientFunds;
+                        //if (net_fee < 0) return VerifyResult.InsufficientFunds;
                     }
             return VerifyResult.Succeed;
         }

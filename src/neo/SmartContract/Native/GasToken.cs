@@ -34,7 +34,7 @@ namespace Neo.SmartContract.Native
             }
             ECPoint[] validators = NEO.GetNextBlockValidators(engine.Snapshot, engine.ProtocolSettings.ValidatorsCount);
             UInt160 primary = Contract.CreateSignatureRedeemScript(validators[engine.PersistingBlock.PrimaryIndex]).ToScriptHash();
-            await Mint(engine, primary, totalNetworkFee, false);
+            //await Mint(engine, primary, totalNetworkFee, false);
         }
 
         [ContractMethod(CpuFee = 1 << 15, RequiredCallFlags = CallFlags.States | CallFlags.AllowNotify)]

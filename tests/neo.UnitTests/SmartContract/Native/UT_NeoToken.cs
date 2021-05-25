@@ -387,7 +387,7 @@ namespace Neo.UnitTests.SmartContract.Native
             unclaim.Value.Should().Be(new BigInteger(0));
             unclaim.State.Should().BeTrue();
 
-            snapshot.GetChangeSet().Count().Should().Be(keyCount + 4); // Gas + new balance
+            snapshot.GetChangeSet().Count().Should().Be(keyCount + 2); // Gas + new balance
 
             // Return balance
 
@@ -441,8 +441,8 @@ namespace Neo.UnitTests.SmartContract.Native
             Check_PostPersist(snapshot, persistingBlock).Should().BeTrue();
 
             var committee = ProtocolSettings.Default.StandbyCommittee;
-            NativeContract.GAS.BalanceOf(snapshot, Contract.CreateSignatureContract(committee[0]).ScriptHash.ToArray()).Should().Be(50000000);
-            NativeContract.GAS.BalanceOf(snapshot, Contract.CreateSignatureContract(committee[1]).ScriptHash.ToArray()).Should().Be(50000000);
+            NativeContract.GAS.BalanceOf(snapshot, Contract.CreateSignatureContract(committee[0]).ScriptHash.ToArray()).Should().Be(0);
+            NativeContract.GAS.BalanceOf(snapshot, Contract.CreateSignatureContract(committee[1]).ScriptHash.ToArray()).Should().Be(0);
             NativeContract.GAS.BalanceOf(snapshot, Contract.CreateSignatureContract(committee[2]).ScriptHash.ToArray()).Should().Be(0);
         }
 

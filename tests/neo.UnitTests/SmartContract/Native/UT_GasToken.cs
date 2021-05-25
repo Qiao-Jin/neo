@@ -91,7 +91,7 @@ namespace Neo.UnitTests.SmartContract.Native
             engine.LoadScript(tx.Script);
             Assert.AreEqual(VMState.HALT, engine.Execute());
             Assert.AreEqual(1, engine.ResultStack.Count);
-            Assert.AreEqual(100_00300140, engine.ResultStack.Pop().GetInteger());
+            Assert.AreEqual(10000000000, engine.ResultStack.Pop().GetInteger());
 
             entry = snapshot.GetAndChange(key, () => new StorageItem(new AccountState()));
             Assert.AreEqual(0, entry.GetInteroperable<AccountState>().Balance);
@@ -106,7 +106,7 @@ namespace Neo.UnitTests.SmartContract.Native
             byte[] to = new byte[20];
             var keyCount = snapshot.GetChangeSet().Count();
             var supply = NativeContract.GAS.TotalSupply(snapshot);
-            supply.Should().Be(3000000050000000); // 3000000000000000 + 50000000 (neo holder reward)
+            supply.Should().Be(3000000000000000);
 
             // Check unclaim
 
@@ -120,7 +120,7 @@ namespace Neo.UnitTests.SmartContract.Native
             NativeContract.NEO.BalanceOf(snapshot, from).Should().Be(100000000);
             NativeContract.NEO.BalanceOf(snapshot, to).Should().Be(0);
 
-            NativeContract.GAS.BalanceOf(snapshot, from).Should().Be(30000500_00000000);
+            NativeContract.GAS.BalanceOf(snapshot, from).Should().Be(30000000_00000000);
             NativeContract.GAS.BalanceOf(snapshot, to).Should().Be(0);
 
             // Check unclaim
@@ -130,9 +130,9 @@ namespace Neo.UnitTests.SmartContract.Native
             unclaim.State.Should().BeTrue();
 
             supply = NativeContract.GAS.TotalSupply(snapshot);
-            supply.Should().Be(3000050050000000);
+            supply.Should().Be(3000000000000000);
 
-            snapshot.GetChangeSet().Count().Should().Be(keyCount + 3); // Gas
+            snapshot.GetChangeSet().Count().Should().Be(keyCount + 1); // Gas
 
             // Transfer
 
@@ -140,14 +140,14 @@ namespace Neo.UnitTests.SmartContract.Native
 
             NativeContract.GAS.Transfer(snapshot, from, to, 30000500_00000000, false, persistingBlock).Should().BeFalse(); // Not signed
             NativeContract.GAS.Transfer(snapshot, from, to, 30000500_00000001, true, persistingBlock).Should().BeFalse(); // More than balance
-            NativeContract.GAS.Transfer(snapshot, from, to, 30000500_00000000, true, persistingBlock).Should().BeTrue(); // All balance
+            NativeContract.GAS.Transfer(snapshot, from, to, 30000000_00000000, true, persistingBlock).Should().BeTrue(); // All balance
 
             // Balance of
 
-            NativeContract.GAS.BalanceOf(snapshot, to).Should().Be(30000500_00000000);
+            NativeContract.GAS.BalanceOf(snapshot, to).Should().Be(30000000_00000000);
             NativeContract.GAS.BalanceOf(snapshot, from).Should().Be(0);
 
-            snapshot.GetChangeSet().Count().Should().Be(keyCount + 1); // All
+            snapshot.GetChangeSet().Count().Should().Be(keyCount + 2); // All
 
             // Burn
 
@@ -160,21 +160,21 @@ namespace Neo.UnitTests.SmartContract.Native
             // Burn more than expected
 
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () =>
-                await NativeContract.GAS.Burn(engine, new UInt160(to), new BigInteger(30000500_00000001)));
+                await NativeContract.GAS.Burn(engine, new UInt160(to), new BigInteger(30000000_00000001)));
 
             // Real burn
 
             await NativeContract.GAS.Burn(engine, new UInt160(to), new BigInteger(1));
 
-            NativeContract.GAS.BalanceOf(snapshot, to).Should().Be(3000049999999999);
+            NativeContract.GAS.BalanceOf(snapshot, to).Should().Be(2999999999999999);
 
-            keyCount.Should().Be(snapshot.GetChangeSet().Count());
+            keyCount.Should().Be(snapshot.GetChangeSet().Count() - 1);
 
             // Burn all
 
-            await NativeContract.GAS.Burn(engine, new UInt160(to), new BigInteger(3000049999999999));
+            await NativeContract.GAS.Burn(engine, new UInt160(to), new BigInteger(2999999999999999));
 
-            (keyCount - 1).Should().Be(snapshot.GetChangeSet().Count());
+            (keyCount).Should().Be(snapshot.GetChangeSet().Count());
 
             // Bad inputs
 

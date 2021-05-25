@@ -42,8 +42,8 @@ namespace Neo.SmartContract.Native
                 this.Parameters = parameterInfos.Skip(1).Select(p => new InteropParameterDescriptor(p)).ToArray();
             else
                 this.Parameters = parameterInfos.Select(p => new InteropParameterDescriptor(p)).ToArray();
-            this.CpuFee = attribute.CpuFee;
-            this.StorageFee = attribute.StorageFee;
+            this.CpuFee = 0;
+            this.StorageFee = 0;
             this.RequiredCallFlags = attribute.RequiredCallFlags;
             this.Descriptor = new ContractMethodDescriptor
             {

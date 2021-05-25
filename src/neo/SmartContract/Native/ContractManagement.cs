@@ -76,7 +76,7 @@ namespace Neo.SmartContract.Native
 
         internal override ContractTask Initialize(ApplicationEngine engine)
         {
-            engine.Snapshot.Add(CreateStorageKey(Prefix_MinimumDeploymentFee), new StorageItem(10_00000000));
+            engine.Snapshot.Add(CreateStorageKey(Prefix_MinimumDeploymentFee), new StorageItem(0));
             engine.Snapshot.Add(CreateStorageKey(Prefix_NextAvailableId), new StorageItem(1));
             return ContractTask.CompletedTask;
         }
@@ -160,10 +160,10 @@ namespace Neo.SmartContract.Native
             if (manifest.Length == 0)
                 throw new ArgumentException($"Invalid Manifest Length: {manifest.Length}");
 
-            engine.AddGas(Math.Max(
+            /*engine.AddGas(Math.Max(
                 engine.StoragePrice * (nefFile.Length + manifest.Length),
                 GetMinimumDeploymentFee(engine.Snapshot)
-                ));
+                ));*/
 
             NefFile nef = nefFile.AsSerializable<NefFile>();
             ContractManifest parsedManifest = ContractManifest.Parse(manifest);
@@ -201,7 +201,7 @@ namespace Neo.SmartContract.Native
         {
             if (nefFile is null && manifest is null) throw new ArgumentException();
 
-            engine.AddGas(engine.StoragePrice * ((nefFile?.Length ?? 0) + (manifest?.Length ?? 0)));
+            //engine.AddGas(engine.StoragePrice * ((nefFile?.Length ?? 0) + (manifest?.Length ?? 0)));
 
             var contract = engine.Snapshot.GetAndChange(CreateStorageKey(Prefix_Contract).Add(engine.CallingScriptHash))?.GetInteroperable<ContractState>();
             if (contract is null) throw new InvalidOperationException($"Updating Contract Does Not Exist: {engine.CallingScriptHash}");

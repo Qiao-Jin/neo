@@ -201,14 +201,14 @@ namespace Neo.SmartContract.Native
                     nodes[index].GAS += GetPrice(engine.Snapshot);
                 }
             }
-            if (nodes != null)
+            /*if (nodes != null)
             {
                 foreach (var (account, gas) in nodes)
                 {
                     if (gas.Sign > 0)
                         await GAS.Mint(engine, account, gas, false);
                 }
-            }
+            }*/
         }
 
         [ContractMethod(RequiredCallFlags = CallFlags.States | CallFlags.AllowNotify)]
@@ -221,11 +221,11 @@ namespace Neo.SmartContract.Native
                 || gasForResponse < 0_10000000)
                 throw new ArgumentException();
 
-            engine.AddGas(GetPrice(engine.Snapshot));
+            //engine.AddGas(GetPrice(engine.Snapshot));
 
             //Mint gas for the response
-            engine.AddGas(gasForResponse);
-            await GAS.Mint(engine, Hash, gasForResponse, false);
+            //engine.AddGas(gasForResponse);
+            //await GAS.Mint(engine, Hash, gasForResponse, false);
 
             //Increase the request id
             StorageItem item_id = engine.Snapshot.GetAndChange(CreateStorageKey(Prefix_RequestId));
